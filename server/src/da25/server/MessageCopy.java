@@ -13,13 +13,17 @@ import da25.base.Message;
  * 
  */
 public class MessageCopy extends Message {
+	private static final long serialVersionUID = 1L;
+	
 	public int recipient;
 	
 	public MessageCopy(Message message, int recipient) {
-		this.sender = message.sender;
-		this.clock = message.clock;
-		this.body = message.body;
+		super(message.sender, message.clock, message.body);
 		
 		this.recipient = recipient;
+	}
+	
+	public Message getOriginal() {
+		return new Message(sender, clock, body);
 	}
 }

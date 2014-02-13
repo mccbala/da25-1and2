@@ -83,11 +83,11 @@ public class Network implements NetworkInterface {
 		}
 
 		try {
-			processes.get(message.recipient).processMessage(message);
+			processes.get(message.recipient).processMessage(message.getOriginal());
 		} catch (RemoteException e) {
 			System.out
-					.println("Failed to send message [" + message.toString()
-							+ "] sent by" + message.sender + " to "
+					.println("Unable to send message [" + message.toString()
+							+ "] sent by " + message.sender + " to "
 							+ message.recipient);
 		}
 
