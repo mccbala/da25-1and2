@@ -1,0 +1,1 @@
+"C:\Programmi\Java\jre7\bin\rmiregistry.exe" -J-Djava.rmi.server.useCodebaseOnly=false
