@@ -42,6 +42,8 @@ public class Client {
 			System.out.println("Unable to register in the network.");
 			throw new RuntimeException(e);
 		}
+		
+		process.start();
 
 		System.out.println("Client " + process.id
 				+ " is running and registered.");

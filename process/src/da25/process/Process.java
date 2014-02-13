@@ -17,6 +17,22 @@ public class Process implements ProcessInterface {
 	public int id;
 	public NetworkInterface network;
 
+	/**
+	 * RMI operations are concluded, starts actual process commands.
+	 */
+	@Override
+	public void start() {
+		Message message = new Message(id, new int[] {0}, "Hello World");
+		
+		try {
+			network.sendMessage(message);
+		} catch (RemoteException e) {
+			System.out
+			.println("Unable to send message [" + message.toString()
+					+ "]");
+		}
+	}
+
 	@Override
 	public void processMessage(Message message) throws RemoteException {
 		System.out.println("Incoming message: [" + message + "]");
