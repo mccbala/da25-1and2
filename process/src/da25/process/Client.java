@@ -43,9 +43,8 @@ public class Client {
 			throw new RuntimeException(e);
 		}
 		
-		System.out.println("Client " + process.id
-				+ " is registered.");
-		process.start();
+		System.out.println("Process " + process.id
+				+ " is registered in the network.");
 	}
 
 }

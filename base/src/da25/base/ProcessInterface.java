@@ -13,7 +13,8 @@ import java.rmi.RemoteException;
  */
 public interface ProcessInterface extends Remote {
 	/**
-	 * RMI operations are concluded, starts actual process commands.
+	 * RMI operations are concluded and the network is now locked, starts actual
+	 * process commands.
 	 * 
 	 * @throws RemoteException
 	 */
@@ -27,11 +28,9 @@ public interface ProcessInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	public void recieveMessage(Message message) throws RemoteException;
+
 	/**
-	 * The process gets an indication that a new process is available in the network
-	 * 
-	 * @param id the id of the new process
-	 * @throws RemoteException
+	 * Remote exit command, useful while testing
 	 */
-	public void newProcess(int id) throws RemoteException;
+	public void exit() throws RemoteException;
 }

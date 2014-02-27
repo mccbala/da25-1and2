@@ -21,82 +21,119 @@ public class Process implements ProcessInterface {
 	public VectorClock clock;
 	public NetworkInterface network;
 	private ArrayList<Message> buffer;
-	private int processCount;
-	
-	public Process(){
+	private boolean started = false;
+
+	public Process() {
 		buffer = new ArrayList<Message>();
-		clock = new VectorClock(10);
 	}
-	
-	/**
-	 * RMI operations are concluded, starts actual process commands.
-	 */
+
 	@Override
 	public void start() {
-		Scanner scanner = new Scanner(System.in);
-		while(true){
-			
-			System.out.println("enter message");
-			String messageBody = scanner.nextLine();
-			if(messageBody.equals("exit")){
-				continue;
+		if (started) {
+			return;
+		} else {
+			started = true;
+		}
+
+		try {
+			clock = new VectorClock(network.getCount());
+		} catch (RemoteException e) {
+			System.out.println("Unable to get client count.");
+			throw new RuntimeException(e);
+		}
+
+		Thread parser = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				parseIn();
 			}
-			System.out.println("enter recipient client");
+		});
+		parser.start();
+	}
+
+	@Override
+	public void exit() throws RemoteException {
+		System.exit(0);
+	}
+
+	/**
+	 * Blocks waiting for user input.
+	 */
+	private void parseIn() {
+		Scanner scanner = new Scanner(System.in);
+		while (true) {
+			System.out.println("Enter message or type 'exit':");
+			String messageBody = scanner.nextLine();
+			if (messageBody.equals("exit")) {
+				scanner.close();
+				return;
+			}
+
+			System.out.println("Enter recipient id:");
 			int recipient = scanner.nextInt();
 			scanner.nextLine();
-			
-			Message message = new Message(id, recipient, clock, messageBody);
-			
+
+			Message message;
+			synchronized (clock) {
+				message = new Message(id, recipient, clock, messageBody);
+			}
+			sendMessage(message);
+		}
+	}
+
+	@Override
+	public void recieveMessage(Message message) throws RemoteException {
+		synchronized (clock) {
+			clock.increase(message.sender);
+			if (clock.greaterEqual(message.clock)) {
+				dispatchMessage(message);
+
+				boolean newUpdate = true;
+				while (newUpdate) {
+					newUpdate = false;
+					for (int i = 0; i < buffer.size(); i++) {
+						Message nextMessage = buffer.get(i);
+						clock.increase(nextMessage.sender);
+						if (clock.greaterEqual(nextMessage.clock)) {
+							newUpdate = true;
+							dispatchMessage(nextMessage);
+							buffer.remove(i);
+							i--;
+						} else {
+							clock.decrease(nextMessage.sender);
+						}
+					}
+				}
+			} else {
+				System.out.println("["+message.toString()+"] put in buffer");
+				clock.decrease(message.sender);
+				buffer.add(message);
+			}
+		}
+	}
+
+	/**
+	 * A message is dispatched from the local buffer for actual elaboration.
+	 * 
+	 * @param message
+	 */
+	private void dispatchMessage(Message message) {
+		System.out.println("Dispatched message: [" + message + "]");
+	}
+
+	/**
+	 * Sends a new broadcast message
+	 */
+	private void sendMessage(Message message) {
+		synchronized (clock) {
 			try {
 				clock.increase(id);
 				network.sendMessage(message);
 			} catch (RemoteException e) {
 				clock.decrease(id);
-				System.out
-				.println("Unable to send message [" + message.toString()
+				System.out.println("Unable to send message [" + message.toString()
 						+ "], because of: " + e.getMessage());
 			}
 		}
-		
-	}
-
-	@Override
-	public void newProcess(int id) throws RemoteException {
-		processCount++;
-		clock.resize(processCount);	
-	}
-	
-	@Override
-	public void recieveMessage(Message message) throws RemoteException {
-		clock.increase(message.sender);
-		if(clock.GreaterEqual(message.clock)){
-			dispatchMessage(message);
-			boolean newUpdate = true;
-			while(newUpdate){
-				newUpdate = false;
-				for(int i = 0; i < buffer.size(); i++){
-					Message nextMessage = buffer.get(i);
-					clock.increase(nextMessage.sender);
-					if(clock.GreaterEqual(nextMessage.clock)){
-						newUpdate = true;
-						dispatchMessage(nextMessage);
-						buffer.remove(i);
-						i--;
-					}
-					else{
-						clock.decrease(nextMessage.sender);
-					}
-				}
-			}
-		}
-		else{
-			clock.decrease(message.sender);
-			System.out.println("Missing messages, message put in buffer");
-			buffer.add(message);	
-		}
-	}
-	
-	private void dispatchMessage(Message message){
-		System.out.println("Incoming message: [" + message + "]");
 	}
 }
