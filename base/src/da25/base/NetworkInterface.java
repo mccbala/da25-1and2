@@ -31,30 +31,29 @@ public interface NetworkInterface extends Remote {
 	public int getCount() throws RemoteException;
 
 	/**
-	 * Send a unicast message.
-	 * 
-	 * @param message
-	 *            The message to be sent.
-	 * @param The
-	 *            ID of recipient process.
-	 * @throws RemoteException
-	 */
-	public void sendMessage(Message message, int recipient)
-			throws RemoteException;
-
-	/**
 	 * Send a broadcast message.
 	 * 
 	 * @param message
 	 *            The message to be sent.
 	 * @throws RemoteException
 	 */
-	public void sendMessage(Message message) throws RemoteException;
+	public void sendMessage(int level, int id, int recipient) throws RemoteException;
 	
 	/**
 	 * Send an acknowledgment
 	 * 
+	 * @param id
+	 *            The id of the reciever
 	 * @throws RemoteException
 	 */
-	public void sendAck() throws RemoteException;
+	public void sendAck(int id) throws RemoteException;
+	
+	/**
+	 * informs server that client with given id is done with this round
+	 * 
+	 * @param id
+	 *            The id of the sender
+	 * @throws RemoteException
+	 */
+	public void done(int id) throws RemoteException;
 }

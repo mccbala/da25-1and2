@@ -35,24 +35,10 @@ public class Network implements NetworkInterface {
 	 */
 	private Thread worker;
 
+	private int[] busyIDs;
+	
 	public Network() {
-		worker = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (true) {
-					synchronized (queue) {
-						if (!queue.isEmpty()) {
-							dispatchMessage();
-						}
-					}
-					
-					try {
-						Thread.sleep(10000);
-					} catch (InterruptedException e) {}
-				}
-			}
-		});
-		worker.start();
+		
 	}
 	
 	@Override
@@ -69,56 +55,63 @@ public class Network implements NetworkInterface {
 	}
 
 	@Override
-	public void sendMessage(Message message, int recipient)
+	public void sendMessage(int level, int id, int recipient)
 			throws RemoteException {
-		synchronized (queue) {
-			queue.add(message);
-		}
+		processes.get(recipient).recieveMessage(level, id);
 	}
 
 	@Override
-	public void sendMessage(Message message) throws RemoteException {
-		synchronized (processes) {
-			if (message.recipient == Message.BROADCAST) {
-				for (int i = 0; i < processes.size(); i++) {
-					if (i != message.sender) {
-						queue.add(new Message(message.sender, i, message.clock, message.body));
+	public void sendAck(int id) throws RemoteException {
+		processes.get(id).recieveAck();
+	}
+
+	@Override
+	public void done(int id) throws RemoteException {
+		System.out.println("client " + id + "reports done");
+		synchronized (busyIDs) {
+			if(busyIDs[id] > 0){
+				throw new RemoteException("Client already send done signal");
+			}
+			busyIDs[id] = 1;
+		}
+		
+	}
+	
+	public void start() {
+		int round = 1;
+		
+		while(true){
+			System.out.println("starting round " + round);
+			busyIDs = new int[processes.size()];
+			
+			communicateNewRound(round);
+			boolean stillBusy = true;
+			while(stillBusy){
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				stillBusy = false;
+				synchronized (busyIDs) {
+					for(int i = 0; i < busyIDs.length; i++){
+						if(busyIDs[i] == 0){
+							stillBusy = true;
+						}
 					}
 				}
-			} else {
-				synchronized (queue) {
-					queue.add(message);
-				}
+			}		
+			round++;
+		}
+		
+	}
+	private void communicateNewRound(int round){
+		for(int i = 0; i < processes.size(); i++){
+			try {
+				processes.get(i).nextRound(round);
+			} catch (RemoteException e) {
+				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Selects a random message from the queue and dispatches it to the
-	 * recipient.
-	 */
-	private void dispatchMessage() {
-		Random rnd = new Random();
-		Message message;
-
-		synchronized (queue) {
-			int index = rnd.nextInt(queue.size());
-			message = queue.remove(index);
-		}
-
-		try {
-			processes.get(message.recipient).recieveMessage(message);
-		} catch (RemoteException e) {
-			System.out
-					.println("Unable to send message [" + message.toString()
-							+ "] sent by " + message.sender + " to "
-							+ message.recipient);
-		}
-	}
-
-	@Override
-	public void sendAck() throws RemoteException {
-		
-		
 	}
 }

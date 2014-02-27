@@ -18,85 +18,60 @@ import da25.base.VectorClock;
  */
 public class Process implements ProcessInterface {
 	public int id;
-	public VectorClock clock;
 	public NetworkInterface network;
-	private ArrayList<Message> buffer;
 	private int processCount;
+	private boolean candidate;
+	private int newRound = 0;
 	
-	public Process(){
-		buffer = new ArrayList<Message>();
-		clock = new VectorClock(10);
-	}
-	
-	/**
-	 * RMI operations are concluded, starts actual process commands.
-	 */
-	@Override
-	public void start() {
-		Scanner scanner = new Scanner(System.in);
+	public void start(){
+		int finishedRound = 0;
 		while(true){
-			
-			System.out.println("enter message");
-			String messageBody = scanner.nextLine();
-			if(messageBody.equals("exit")){
-				continue;
+			while(newRound <= finishedRound){
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-			System.out.println("enter recipient client");
-			int recipient = scanner.nextInt();
-			scanner.nextLine();
-			
-			Message message = new Message(id, recipient, clock, messageBody);
-			
+			if(candidate){
+				performCandidateRound(newRound);
+			}
+			performOrdinaryRound(newRound);
+			finishedRound++;
 			try {
-				clock.increase(id);
-				network.sendMessage(message);
+				network.done(id);
 			} catch (RemoteException e) {
-				clock.decrease(id);
-				System.out
-				.println("Unable to send message [" + message.toString()
-						+ "], because of: " + e.getMessage());
+				e.printStackTrace();
 			}
 		}
+	}
+	
+	@Override
+	public void nextRound(int round) {
+		newRound = round;
+	}
+
+
+	private void performCandidateRound(int round) {
+		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public void newProcess(int id) throws RemoteException {
-		processCount++;
-		clock.resize(processCount);	
+	private void performOrdinaryRound(int round) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
-	public void recieveMessage(Message message) throws RemoteException {
-		clock.increase(message.sender);
-		if(clock.GreaterEqual(message.clock)){
-			dispatchMessage(message);
-			boolean newUpdate = true;
-			while(newUpdate){
-				newUpdate = false;
-				for(int i = 0; i < buffer.size(); i++){
-					Message nextMessage = buffer.get(i);
-					clock.increase(nextMessage.sender);
-					if(clock.GreaterEqual(nextMessage.clock)){
-						newUpdate = true;
-						dispatchMessage(nextMessage);
-						buffer.remove(i);
-						i--;
-					}
-					else{
-						clock.decrease(nextMessage.sender);
-					}
-				}
-			}
-		}
-		else{
-			clock.decrease(message.sender);
-			System.out.println("Missing messages, message put in buffer");
-			buffer.add(message);	
-		}
+	public void recieveMessage(int level, int id) throws RemoteException {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	private void dispatchMessage(Message message){
-		System.out.println("Incoming message: [" + message + "]");
+
+
+	@Override
+	public void recieveAck() throws RemoteException {
+		// TODO Auto-generated method stub
+		
 	}
 }
