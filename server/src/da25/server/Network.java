@@ -31,10 +31,30 @@ public class Network implements NetworkInterface {
 	 */
 	protected ArrayList<Message> queue = new ArrayList<>();
 	/**
-	 * Flag indicating whether a dispatch thread is present in the system.
+	 * A worker thread who regularly checks the message queue.
 	 */
-	private Boolean dispatchPending = false;
+	private Thread worker;
 
+	public Network() {
+		worker = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					synchronized (queue) {
+						if (!queue.isEmpty()) {
+							dispatchMessage();
+						}
+					}
+					
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {}
+				}
+			}
+		});
+		worker.run();
+	}
+	
 	@Override
 	public int register(ProcessInterface process) throws RemoteException {
 		synchronized (processes) {
@@ -53,7 +73,6 @@ public class Network implements NetworkInterface {
 			throws RemoteException {
 		synchronized (queue) {
 			queue.add(message);
-			scheduleDispatch();
 		}
 	}
 
@@ -66,11 +85,9 @@ public class Network implements NetworkInterface {
 						queue.add(new Message(message.sender, i, message.clock, message.body));
 					}
 				}
-				scheduleDispatch();
 			} else {
 				synchronized (queue) {
 					queue.add(message);
-					scheduleDispatch();
 				}
 			}
 		}
@@ -97,38 +114,5 @@ public class Network implements NetworkInterface {
 							+ "] sent by " + message.sender + " to "
 							+ message.recipient);
 		}
-
-		synchronized (queue) {
-			dispatchPending = false;
-			if (queue.size() != 0) {
-				scheduleDispatch();
-			}
-		}
-	}
-
-	/**
-	 * Schedules a dispatch with a fixed delay.
-	 */
-	private void scheduleDispatch() {
-		synchronized (dispatchPending) {
-			if (dispatchPending) {
-				return;
-			} else {
-				dispatchPending = true;
-			}
-		}
-
-		Thread dispatcher = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-				}
-
-				Network.this.dispatchMessage();
-			}
-		});
-		dispatcher.run();
 	}
 }

@@ -3,8 +3,7 @@ package da25.base;
 import java.io.Serializable;
 
 /**
- * A basic class representing a message. The message recipients are not
- * specified, so it can be a unicast, multicast or broadcast message.
+ * A basic class representing a message.
  * 
  * @author Stefano Tribioli
  * @author Casper Folkers
