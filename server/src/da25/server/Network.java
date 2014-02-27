@@ -59,9 +59,6 @@ public class Network implements NetworkInterface {
 	public int register(ProcessInterface process) throws RemoteException {
 		synchronized (processes) {
 			processes.add(process);
-//			for (int i = 0; i < processes.size(); i++) {
-//				processes.get(i).newProcess(processes.size() - 1);
-//			}
 			return processes.size() - 1;
 		}
 	}
@@ -117,5 +114,11 @@ public class Network implements NetworkInterface {
 							+ "] sent by " + message.sender + " to "
 							+ message.recipient);
 		}
+	}
+
+	@Override
+	public void sendAck() throws RemoteException {
+		
+		
 	}
 }

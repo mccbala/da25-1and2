@@ -50,4 +50,11 @@ public interface NetworkInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	public void sendMessage(Message message) throws RemoteException;
+	
+	/**
+	 * Send an acknowledgment
+	 * 
+	 * @throws RemoteException
+	 */
+	public void sendAck() throws RemoteException;
 }
