@@ -22,7 +22,7 @@ public class Process implements ProcessInterface {
 	 */
 	@Override
 	public void start() {
-		Message message = new Message(id, new int[] {0}, "Hello World");
+		Message message = new Message(id, Message.BROADCAST, new int[] {0}, "Hello World");
 		
 		try {
 			network.sendMessage(message);

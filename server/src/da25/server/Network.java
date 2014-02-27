@@ -25,11 +25,11 @@ public class Network implements NetworkInterface {
 	/**
 	 * List holding references for all processes.
 	 */
-	private ArrayList<ProcessInterface> processes = new ArrayList<>();
+	protected ArrayList<ProcessInterface> processes = new ArrayList<>();
 	/**
 	 * List holding the messages waiting to be dispatched.
 	 */
-	private ArrayList<MessageCopy> queue = new ArrayList<>();
+	protected ArrayList<Message> queue = new ArrayList<>();
 	/**
 	 * Flag indicating whether a dispatch thread is present in the system.
 	 */
@@ -51,9 +51,8 @@ public class Network implements NetworkInterface {
 	@Override
 	public void sendMessage(Message message, int recipient)
 			throws RemoteException {
-		MessageCopy copy = new MessageCopy(message, recipient);
 		synchronized (queue) {
-			queue.add(copy);
+			queue.add(message);
 			scheduleDispatch();
 		}
 	}
@@ -61,9 +60,17 @@ public class Network implements NetworkInterface {
 	@Override
 	public void sendMessage(Message message) throws RemoteException {
 		synchronized (processes) {
-			for (int i = 0; i < processes.size(); i++) {
-				if (i != message.sender) {
-					sendMessage(message, i);
+			if (message.recipient == Message.BROADCAST) {
+				for (int i = 0; i < processes.size(); i++) {
+					if (i != message.sender) {
+						queue.add(new Message(message.sender, i, message.clock, message.body));
+					}
+				}
+				scheduleDispatch();
+			} else {
+				synchronized (queue) {
+					queue.add(message);
+					scheduleDispatch();
 				}
 			}
 		}
@@ -75,7 +82,7 @@ public class Network implements NetworkInterface {
 	 */
 	private void dispatchMessage() {
 		Random rnd = new Random();
-		MessageCopy message;
+		Message message;
 
 		synchronized (queue) {
 			int index = rnd.nextInt(queue.size());
@@ -83,7 +90,7 @@ public class Network implements NetworkInterface {
 		}
 
 		try {
-			processes.get(message.recipient).processMessage(message.getOriginal());
+			processes.get(message.recipient).processMessage(message);
 		} catch (RemoteException e) {
 			System.out
 					.println("Unable to send message [" + message.toString()

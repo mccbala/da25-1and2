@@ -12,13 +12,16 @@ import java.io.Serializable;
  */
 public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final int BROADCAST = -1;
 	
 	public int sender;
+	public int recipient;
 	public int[] clock;
 	public String body;
 	
-	public Message(int sender, int[] clock, String body) {
+	public Message(int sender, int recipient, int[] clock, String body) {
 		this.sender = sender;
+		this.recipient = recipient;
 		this.clock = clock;
 		this.body = body;
 	}
@@ -26,7 +29,7 @@ public class Message implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
-		bld.append("Message (");
+		bld.append("Message from "+this.sender+" (");
 		for (int i = 0; i < clock.length; i++) {
 			bld.append(clock[i]);
 			bld.append(",");
