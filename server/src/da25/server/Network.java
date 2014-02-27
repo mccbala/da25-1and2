@@ -52,7 +52,7 @@ public class Network implements NetworkInterface {
 				}
 			}
 		});
-		worker.run();
+		worker.start();
 	}
 	
 	@Override
