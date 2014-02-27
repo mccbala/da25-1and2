@@ -35,14 +35,6 @@ public class Server {
 		
 		System.out.println("Network is running, waiting for clients.");
 		
-		try {
-			int c = System.in.read();
-			if (c == 's') {
-				for (ProcessInterface process : network.processes) {
-					process.start();
-				}
-			}
-		} catch (IOException e) {}
 		
 		
 	}

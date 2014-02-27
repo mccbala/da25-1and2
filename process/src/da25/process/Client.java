@@ -45,6 +45,7 @@ public class Client {
 		
 		System.out.println("Client " + process.id
 				+ " is registered.");
+		process.start();
 	}
 
 }

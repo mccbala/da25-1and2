@@ -26,5 +26,12 @@ public interface ProcessInterface extends Remote {
 	 * @param message
 	 * @throws RemoteException
 	 */
-	public void processMessage(Message message) throws RemoteException;
+	public void recieveMessage(Message message) throws RemoteException;
+	/**
+	 * The process gets an indication that a new process is available in the network
+	 * 
+	 * @param id the id of the new process
+	 * @throws RemoteException
+	 */
+	public void newProcess(int id) throws RemoteException;
 }

@@ -47,7 +47,7 @@ public class Network implements NetworkInterface {
 					}
 					
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(10000);
 					} catch (InterruptedException e) {}
 				}
 			}
@@ -59,6 +59,9 @@ public class Network implements NetworkInterface {
 	public int register(ProcessInterface process) throws RemoteException {
 		synchronized (processes) {
 			processes.add(process);
+//			for (int i = 0; i < processes.size(); i++) {
+//				processes.get(i).newProcess(processes.size() - 1);
+//			}
 			return processes.size() - 1;
 		}
 	}
@@ -107,7 +110,7 @@ public class Network implements NetworkInterface {
 		}
 
 		try {
-			processes.get(message.recipient).processMessage(message);
+			processes.get(message.recipient).recieveMessage(message);
 		} catch (RemoteException e) {
 			System.out
 					.println("Unable to send message [" + message.toString()

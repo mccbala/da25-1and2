@@ -15,10 +15,10 @@ public class Message implements Serializable {
 	
 	public int sender;
 	public int recipient;
-	public int[] clock;
+	public VectorClock clock;
 	public String body;
 	
-	public Message(int sender, int recipient, int[] clock, String body) {
+	public Message(int sender, int recipient, VectorClock clock, String body) {
 		this.sender = sender;
 		this.recipient = recipient;
 		this.clock = clock;
@@ -29,11 +29,8 @@ public class Message implements Serializable {
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
 		bld.append("Message from "+this.sender+" saying: " + body +  " (");
-		for (int i = 0; i < clock.length; i++) {
-			bld.append(clock[i]);
-			bld.append(",");
-		}
-		bld.deleteCharAt(bld.length()-1);
+		
+		bld.append(clock.toString());
 		bld.append(")");
 		return bld.toString();
 	}
