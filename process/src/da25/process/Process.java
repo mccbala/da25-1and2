@@ -1,6 +1,7 @@
 package da25.process;
 
 import java.rmi.RemoteException;
+import java.util.Scanner;
 
 import da25.base.Message;
 import da25.base.NetworkInterface;
@@ -22,15 +23,26 @@ public class Process implements ProcessInterface {
 	 */
 	@Override
 	public void start() {
-		Message message = new Message(id, Message.BROADCAST, new int[] {0}, "Hello World");
-		
-		try {
-			network.sendMessage(message);
-		} catch (RemoteException e) {
-			System.out
-			.println("Unable to send message [" + message.toString()
-					+ "]");
+		Scanner scanner = new Scanner(System.in);
+		while(true){
+			
+			System.out.println("enter message");
+			String messageBody = scanner.nextLine();
+			System.out.println("enter recipient client");
+			int recipient = scanner.nextInt();
+			scanner.nextLine();
+			
+			Message message = new Message(id, recipient, new int[] {0}, messageBody);
+			
+			try {
+				network.sendMessage(message);
+			} catch (RemoteException e) {
+				System.out
+				.println("Unable to send message [" + message.toString()
+						+ "]");
+			}
 		}
+		
 	}
 
 	@Override
