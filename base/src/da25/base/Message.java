@@ -28,7 +28,7 @@ public class Message implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder bld = new StringBuilder();
-		bld.append("Message from "+this.sender+" (");
+		bld.append("Message from "+this.sender+" saying: " + body +  " (");
 		for (int i = 0; i < clock.length; i++) {
 			bld.append(clock[i]);
 			bld.append(",");
