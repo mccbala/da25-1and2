@@ -114,29 +114,21 @@ public class Network implements NetworkInterface {
 						}
 					}
 					locked = true;
+
+					testCase1();
+
+					break;
+				case "next":
+					forwardSingleSequentially();
 					break;
 				case "flush":
-					synchronized (queue) {
-						while (!queue.isEmpty()) {
-							forwardMessage(0);
-						}
-					}
+					forwardAllSequentially();
 					break;
 				case "rnd":
-					synchronized (queue) {
-						if (!queue.isEmpty()) {
-							Random rnd = new Random();
-							forwardMessage(rnd.nextInt(queue.size()));
-						}
-					}
+					forwardSingleRandomly();
 					break;
 				case "rndflush":
-					synchronized (queue) {
-						Random rnd = new Random();
-						while (!queue.isEmpty()) {
-							forwardMessage(rnd.nextInt(queue.size()));
-						}
-					}
+					forwardAllRandomly();
 					break;
 				case "auto":
 					worker.start();
@@ -179,24 +171,53 @@ public class Network implements NetworkInterface {
 						Message messageCopy = new Message(message.sender, i,
 								message.clock, message.body);
 						queue.add(messageCopy);
-						System.out.println("[" + messageCopy.toString()
-								+ "] put in queue. Queue size is "
+						System.out.println(messageCopy
+								+ " put in queue. Queue size is "
 								+ queue.size());
 					}
 				}
 			} else {
 				synchronized (queue) {
 					queue.add(message);
-					System.out.println("[" + message.toString()
-							+ "] put in queue. Queue size is " + queue.size());
+					System.out.println(message
+							+ " put in queue. Queue size is " + queue.size());
 				}
 			}
 		}
 	}
 
+	private void forwardSingleRandomly() {
+		synchronized (queue) {
+			if (!queue.isEmpty()) {
+				Random rnd = new Random();
+				forwardMessage(rnd.nextInt(queue.size()));
+			}
+		}
+	}
+
+	private void forwardSingleSequentially() {
+		forwardMessage(0);
+	}
+
+	private void forwardAllSequentially() {
+		synchronized (queue) {
+			while (!queue.isEmpty()) {
+				forwardMessage(0);
+			}
+		}
+	}
+
+	private void forwardAllRandomly() {
+		synchronized (queue) {
+			Random rnd = new Random();
+			while (!queue.isEmpty()) {
+				forwardMessage(rnd.nextInt(queue.size()));
+			}
+		}
+	}
+
 	/**
-	 * Selects a random message from the queue and dispatches it to the
-	 * recipient.
+	 * Dispatches a message from the queue to the recipient.
 	 */
 	private void forwardMessage(int index) {
 		Message message;
@@ -206,12 +227,29 @@ public class Network implements NetworkInterface {
 		}
 
 		try {
-			System.out.println("Dispatching [" + message + "]");
+			System.out.println("Forwarding " + message);
 			processes.get(message.recipient).recieveMessage(message);
 		} catch (RemoteException e) {
-			System.out.println("Unable to send message [" + message.toString()
-					+ "] sent by " + message.sender + " to "
+			System.out.println("Unable to send message " + message.toString()
+					+ " sent by " + message.sender + " to "
 					+ message.recipient);
+		}
+	}
+
+	/**
+	 * Test case 1 This simple test case is equal to the one presented in the
+	 * Lecture Slides (slide 6)
+	 */
+	private void testCase1() {
+		try {
+			processes.get(0).sendMessage(Message.BROADCAST, "First broadcast");
+			forwardMessage(0);
+			processes.get(1).sendMessage(Message.BROADCAST, "Second broadcast");
+			forwardMessage(2);
+			forwardMessage(0);
+			forwardMessage(0);
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 	}
 }

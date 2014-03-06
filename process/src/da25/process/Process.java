@@ -42,13 +42,14 @@ public class Process implements ProcessInterface {
 			throw new RuntimeException(e);
 		}
 
+		@SuppressWarnings("unused")
 		Thread parser = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				parseIn();
 			}
 		});
-		parser.start();
+		//parser.start();
 	}
 
 	@Override
@@ -105,7 +106,7 @@ public class Process implements ProcessInterface {
 					}
 				}
 			} else {
-				System.out.println("["+message.toString()+"] put in buffer");
+				System.out.println(message+" put in buffer");
 				clock.decrease(message.sender);
 				buffer.add(message);
 			}
@@ -118,11 +119,18 @@ public class Process implements ProcessInterface {
 	 * @param message
 	 */
 	private void dispatchMessage(Message message) {
-		System.out.println("Dispatched message: [" + message + "]");
+		System.out.println("Dispatched message: " + message);
 	}
 
+	@Override
+	public void sendMessage(int recipient, String body) {
+		synchronized (clock) {
+			sendMessage(new Message(id, recipient, clock, body));
+		}
+	};
+	
 	/**
-	 * Sends a new broadcast message
+	 * Sends a new broadcast message.
 	 */
 	private void sendMessage(Message message) {
 		synchronized (clock) {
@@ -131,8 +139,8 @@ public class Process implements ProcessInterface {
 				network.sendMessage(message);
 			} catch (RemoteException e) {
 				clock.decrease(id);
-				System.out.println("Unable to send message [" + message.toString()
-						+ "], because of: " + e.getMessage());
+				System.out.println("Unable to send message " + message
+						+ ", because of: " + e.getMessage());
 			}
 		}
 	}

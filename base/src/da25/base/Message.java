@@ -27,11 +27,6 @@ public class Message implements Serializable {
 	
 	@Override
 	public String toString() {
-		StringBuilder bld = new StringBuilder();
-		bld.append("Message from "+sender+" saying: " + body +  " (");
-		
-		bld.append(clock.toString());
-		bld.append(")");
-		return bld.toString();
+		return "[Message from "+sender+" to "+recipient+" (VC "+clock+") saying '" + body +  "']";
 	}
 }
