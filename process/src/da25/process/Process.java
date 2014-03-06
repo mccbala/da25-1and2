@@ -87,7 +87,7 @@ public class Process implements ProcessInterface {
 		synchronized (clock) {
 			clock.increase(message.sender);
 			if (clock.greaterEqual(message.clock)) {
-				dispatchMessage(message);
+				deliverMessage(message);
 
 				boolean newUpdate = true;
 				while (newUpdate) {
@@ -97,7 +97,7 @@ public class Process implements ProcessInterface {
 						clock.increase(nextMessage.sender);
 						if (clock.greaterEqual(nextMessage.clock)) {
 							newUpdate = true;
-							dispatchMessage(nextMessage);
+							deliverMessage(nextMessage);
 							buffer.remove(i);
 							i--;
 						} else {
@@ -114,12 +114,12 @@ public class Process implements ProcessInterface {
 	}
 
 	/**
-	 * A message is dispatched from the local buffer for actual elaboration.
+	 * A message is delivered from the local buffer for actual elaboration.
 	 * 
 	 * @param message
 	 */
-	private void dispatchMessage(Message message) {
-		System.out.println("Dispatched message: " + message);
+	private void deliverMessage(Message message) {
+		System.out.println("Delivered message: " + message);
 	}
 
 	@Override
