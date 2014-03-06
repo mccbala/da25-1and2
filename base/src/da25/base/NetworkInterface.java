@@ -56,4 +56,6 @@ public interface NetworkInterface extends Remote {
 	 * @throws RemoteException
 	 */
 	public void done(int id) throws RemoteException;
+
+	void ackDone(int id) throws RemoteException;
 }

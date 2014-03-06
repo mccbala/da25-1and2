@@ -26,4 +26,12 @@ public interface ProcessInterface extends Remote {
 	public void recieveAck() throws RemoteException;
 
 	public void nextRound(int round) throws RemoteException;
+
+	public void startElection() throws RemoteException;
+
+	public void UpdateClientList(int[] clients) throws RemoteException;
+
+	public int getID() throws RemoteException;
+
+	public void doneAck() throws RemoteException;
 }

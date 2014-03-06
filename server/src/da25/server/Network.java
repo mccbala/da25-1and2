@@ -36,6 +36,7 @@ public class Network implements NetworkInterface {
 	private Thread worker;
 
 	private int[] busyIDs;
+	private int[] busyAckIDs;
 	
 	public Network() {
 		
@@ -66,6 +67,17 @@ public class Network implements NetworkInterface {
 	}
 
 	@Override
+	public void ackDone(int id) throws RemoteException {
+		System.out.println("client " + id + "reports done");
+		synchronized (busyAckIDs) {
+			if(busyAckIDs[id] > 0){
+				throw new RemoteException("Client already send ack done signal");
+			}
+			busyAckIDs[id] = 1;
+		}
+	}
+	
+	@Override
 	public void done(int id) throws RemoteException {
 		System.out.println("client " + id + "reports done");
 		synchronized (busyIDs) {
@@ -79,12 +91,52 @@ public class Network implements NetworkInterface {
 	
 	public void start() {
 		int round = 1;
+		int[] clientIDs = new int[processes.size()];
+		for(int i = 0; i < processes.size(); i++){
+			try {
+				clientIDs [i] = processes.get(i).getID();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		for(int i = 0; i < processes.size(); i++){
+			try {
+				processes.get(i).UpdateClientList(clientIDs);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
 		
-		while(true){
+		while(round < 10){
 			System.out.println("starting round " + round);
 			busyIDs = new int[processes.size()];
-			
+			busyAckIDs = new int[processes.size()];
+			if(round == 3){
+				try {
+					processes.get(0).startElection();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			communicateNewRound(round);
+			boolean stillAcking = true;
+			while(stillAcking){
+				try {
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				stillAcking = false;
+				synchronized (busyAckIDs) {
+					for(int i = 0; i < busyAckIDs.length; i++){
+						if(busyAckIDs[i] == 0){
+							stillAcking = true;
+						}
+					}
+				}
+			}
+			communicateDoneAck();
 			boolean stillBusy = true;
 			while(stillBusy){
 				try {
@@ -105,6 +157,16 @@ public class Network implements NetworkInterface {
 		}
 		
 	}
+	private void communicateDoneAck() {
+		for(int i = 0; i < processes.size(); i++){
+			try {
+				processes.get(i).doneAck();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	private void communicateNewRound(int round){
 		for(int i = 0; i < processes.size(); i++){
 			try {
