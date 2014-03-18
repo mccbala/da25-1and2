@@ -7,6 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import da25.base.NetworkInterface;
 import da25.base.ProcessInterface;
+import da25.base.exceptions.LockedException;
 
 /**
  * Main class for clients, holding RMI logic only.
@@ -37,9 +38,13 @@ public class Client {
 					.exportObject(process, 0);
 
 			process.network = network;
-			process.id = network.register(stub);
+			try {
+				process.id = network.register(stub);
+			} catch (LockedException e) {
+				System.out.println("Unable to register: network is locked.");
+			}
 		} catch (RemoteException e) {
-			System.out.println("Unable to register in the network.");
+			System.out.println("Unable to register: RemoteException.");
 			throw new RuntimeException(e);
 		}
 		

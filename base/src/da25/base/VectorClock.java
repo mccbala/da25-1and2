@@ -1,51 +1,72 @@
 package da25.base;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class VectorClock implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private int[] vector;
-	
-	public VectorClock(int size){
-		vector = new int[size];
+	private HashMap<Integer, Integer> vector;
+
+	public VectorClock() {
+		vector = new HashMap<>();
 	}
 	
-	public void reset(){
-		for(int i = 0; i< vector.length; i++){
-			vector[i] = 0;
+	public VectorClock(VectorClock vectorClock) {
+		vector = new HashMap<>(vectorClock.vector);
+	}
+	
+	synchronized public void reset() {
+		vector.clear();
+	}
+
+	synchronized public int get(int index) {
+		try {
+			return vector.get(index).intValue();
+		} catch (NullPointerException e) {
+			return 0;
 		}
 	}
-	
-	public int get(int index){
-		return vector[index];
+
+	synchronized public void increase(int index) {
+		vector.put(index, get(index) + 1);
 	}
-	
-	public void increase(int index){
-		vector[index]++;
+
+	synchronized public void decrease(int index) {
+		vector.put(index, get(index) - 1);
 	}
-	
-	public void decrease(int index){
-		vector[index]--;
-	}
-	
-	public boolean greaterEqual(VectorClock otherClock){
-		for (int i = 0; i < vector.length; i++) {
-			if (vector[i] < otherClock.get(i)) {
+
+	synchronized public boolean greaterEqual(VectorClock otherClock) {
+		for (int key : otherClock.vector.keySet()) {
+			if (get(key) < otherClock.get(key)) {
 				return false;
 			}
 		}
 		
 		return true;
 	}
-	
+
 	@Override
-	public String toString(){
+	synchronized public String toString() {
+		int largestId = 0;
+		for (int key : vector.keySet()) {
+			if (key > largestId) {
+				largestId = key;
+			}
+		}
+		
 		StringBuilder bld = new StringBuilder();
-		for (int i = 0; i < vector.length; i++) {
-			bld.append(vector[i]);
+		bld.append("(");
+		
+		for (int i = 1; i <= largestId; i++) {
+			bld.append(get(i));
 			bld.append(",");
 		}
-		bld.deleteCharAt(bld.length()-1);
+		
+		if (bld.length() > 1) {
+			bld.deleteCharAt(bld.length() - 1);
+		}
+		
+		bld.append(")");
 		return bld.toString();
 	}
 }

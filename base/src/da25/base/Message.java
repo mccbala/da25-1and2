@@ -27,6 +27,6 @@ public class Message implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "[Message from "+sender+" to "+recipient+" (VC "+clock+") saying '" + body +  "']";
+		return "[Message from "+sender+" to "+recipient+", VC"+clock+", saying '" + body +  "']";
 	}
 }

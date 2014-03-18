@@ -35,12 +35,7 @@ public class Process implements ProcessInterface {
 			started = true;
 		}
 
-		try {
-			clock = new VectorClock(network.getCount());
-		} catch (RemoteException e) {
-			System.out.println("Unable to get client count.");
-			throw new RuntimeException(e);
-		}
+		clock = new VectorClock();
 
 		@SuppressWarnings("unused")
 		Thread parser = new Thread(new Runnable() {
@@ -49,7 +44,7 @@ public class Process implements ProcessInterface {
 				parseIn();
 			}
 		});
-		//parser.start();
+		// parser.start();
 	}
 
 	@Override
@@ -74,11 +69,7 @@ public class Process implements ProcessInterface {
 			int recipient = scanner.nextInt();
 			scanner.nextLine();
 
-			Message message;
-			synchronized (clock) {
-				message = new Message(id, recipient, clock, messageBody);
-			}
-			sendMessage(message);
+			sendMessage(recipient, messageBody);
 		}
 	}
 
@@ -106,7 +97,7 @@ public class Process implements ProcessInterface {
 					}
 				}
 			} else {
-				System.out.println(message+" put in buffer");
+				System.out.println(message + " put in buffer");
 				clock.decrease(message.sender);
 				buffer.add(message);
 			}
@@ -122,20 +113,15 @@ public class Process implements ProcessInterface {
 		System.out.println("Delivered message: " + message);
 	}
 
-	@Override
-	public void sendMessage(int recipient, String body) {
-		synchronized (clock) {
-			sendMessage(new Message(id, recipient, clock, body));
-		}
-	};
-	
 	/**
 	 * Sends a new broadcast message.
 	 */
-	private void sendMessage(Message message) {
+	@Override
+	public void sendMessage(int recipient, String body) {
 		synchronized (clock) {
+			clock.increase(id);
+			Message message = new Message(id, recipient, new VectorClock(clock), body);
 			try {
-				clock.increase(id);
 				network.sendMessage(message);
 			} catch (RemoteException e) {
 				clock.decrease(id);

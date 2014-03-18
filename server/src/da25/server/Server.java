@@ -20,7 +20,7 @@ public class Server {
 	public static void main(String[] args) {
 		System.setProperty("java.rmi.server.codebase", NetworkInterface.class.getProtectionDomain().getCodeSource().getLocation().toString());
 		
-		network = new Network();
+		network = new AsyncNetwork();
 		
 		try {
 			NetworkInterface stub = (NetworkInterface) UnicastRemoteObject.exportObject(network, 0);
