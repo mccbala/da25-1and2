@@ -3,7 +3,6 @@ package da25.server;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-import da25.base.Message;
 import da25.base.exceptions.DuplicateIDException;
 import da25.base.exceptions.LockedException;
 import da25.process.AgProcess;
@@ -43,12 +42,19 @@ public class AgNetwork extends SyncNetwork {
 	 * Test case 1: TODO
 	 */
 	private void testCase1() throws LockedException, DuplicateIDException, RemoteException {
-		populateNetwork(10);
+		populateNetwork(200);
+		
+		((AgProcess) processes.get(4)).randomize = true;
+		((AgProcess) processes.get(4)).startCandidate();
+		
+		((AgProcess) processes.get(10)).randomize = true;
+		((AgProcess) processes.get(10)).startCandidate();
+		
+		performCommand(null, "round");
+		
+		((AgProcess) processes.get(100)).randomize = true;
+		((AgProcess) processes.get(100)).startCandidate();
 		
 		performCommand(null, "auto");
-		
-		for (int i = 1; i <= 10; i++) {
-			processes.get(i).sendMessage(Message.NETWORK, SyncNetwork.READY_ROUND);
-		}
 	}
 }

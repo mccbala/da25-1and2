@@ -31,7 +31,7 @@ public abstract class Process implements ProcessInterface {
 	public void exit() throws RemoteException {
 		System.exit(0);
 	}
-
+	
 	/**
 	 * A message is delivered from the local buffer for actual elaboration.
 	 * Since we are only showcasing control algorithms, the process simply

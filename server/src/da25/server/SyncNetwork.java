@@ -1,8 +1,13 @@
 package da25.server;
 
+import java.rmi.RemoteException;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
+import da25.base.Constants;
 import da25.base.Message;
+import da25.base.ProcessInterface;
+import da25.base.VectorClock;
 import da25.process.Process;
 
 /**
@@ -14,43 +19,37 @@ import da25.process.Process;
  */
 public class SyncNetwork extends Network {
 	/**
-	 * Message body to signal readiness.
-	 * <p>
-	 * When a process has sent all its messages for a round and is ready to
-	 * receive the ones pertaining to the next one, it sends a control message
-	 * with recipient Message.NETWORK and body READ_ROUND.
-	 */
-	public static final String READY_ROUND = "READY_ROUND";
-
-	/**
 	 * Keeps track of the number of processes who have already signalled to be
 	 * ready.
 	 */
 	private int readyCount = 0;
 
 	/**
-	 * If true, the network will proceed to the next round as soon as all
-	 * processes have signalled to be ready, otherwise it will wait for a user's
-	 * "round" command.
+	 * If positive, the network will proceed to the next round as soon as all
+	 * processes have signalled to be ready (autoMode on), if negative it will
+	 * wait for a user's "round" command (autoMode off), if zero it will be in
+	 * autoMode for the current round, but then it will switch back to autoMode
+	 * off.
 	 */
-	private boolean autoMode = false;
+	private int autoMode = -1;
 
 	public SyncNetwork(Class<? extends Process> processClass) {
 		super(processClass);
 	}
 
 	@Override
-	protected boolean performCommand(Scanner scanner, String command) {
+	synchronized protected boolean performCommand(Scanner scanner,
+			String command) {
 		switch (command) {
 		case "round":
 			if (readyCount == processes.size()) {
 				nextRound();
 			} else {
-				System.out.println("Waiting for all the processes to be ready.");
+				autoMode = 0;
 			}
 			return true;
 		case "auto":
-			autoMode = true;
+			autoMode = +1;
 			if (readyCount == processes.size()) {
 				nextRound();
 			}
@@ -61,12 +60,21 @@ public class SyncNetwork extends Network {
 	}
 
 	@Override
-	protected void processControlMessage(Message message) {
+	public void lock() {
+		super.lock();
+		readyCount = processes.size();
+	}
+
+	@Override
+	synchronized protected void processControlMessage(Message message) {
 		switch (message.body) {
-		case READY_ROUND:
+		case Constants.READY_ROUND:
 			readyCount++;
-			System.out.println("Process "+message.sender+" is ready, readyCount is "+readyCount);
-			if (autoMode && readyCount == processes.size()) {
+			if (autoMode >= 0 && readyCount == processes.size()) {
+				if (autoMode == 0) {
+					autoMode = -1;
+				}
+				
 				nextRound();
 			}
 			return;
@@ -76,8 +84,20 @@ public class SyncNetwork extends Network {
 		}
 	}
 
-	private void nextRound() {
+	synchronized protected void nextRound() {
+		readyCount = 0;
 		System.out.println("Starting a new round.");
-		forwardAllSequentially();
+		synchronized (queue) {
+			forwardAllSequentially();
+			for (Entry<Integer, ProcessInterface> pair : processes.entrySet()) {
+				try {
+					pair.getValue().recieveMessage(
+							new Message(Constants.NETWORK, pair.getKey(),
+									new VectorClock(), Constants.PULSE_ROUND));
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 }

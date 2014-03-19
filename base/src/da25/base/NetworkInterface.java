@@ -2,6 +2,7 @@ package da25.base;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Set;
 
 import da25.base.exceptions.DuplicateIDException;
 import da25.base.exceptions.LockedException;
@@ -52,11 +53,11 @@ public interface NetworkInterface extends Remote {
 			throws RemoteException, LockedException, DuplicateIDException;
 
 	/**
-	 * Get a count of registered processes.
+	 * Get a list of registered processes' IDs.
 	 * 
 	 * @throws RemoteException
 	 */
-	public int getCount() throws RemoteException;
+	public Set<Integer> getIds() throws RemoteException;
 
 	/**
 	 * This function is called by processes willing to send a message. The

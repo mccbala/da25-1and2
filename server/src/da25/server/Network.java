@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Set;
 
+import da25.base.Constants;
 import da25.base.Message;
 import da25.base.NetworkInterface;
 import da25.base.ProcessInterface;
@@ -102,8 +104,8 @@ public abstract class Network implements NetworkInterface {
 	}
 
 	@Override
-	public int getCount() throws RemoteException {
-		return processes.size();
+	public Set<Integer> getIds() throws RemoteException {
+		return processes.keySet();
 	}
 
 	/**
@@ -170,7 +172,7 @@ public abstract class Network implements NetworkInterface {
 			System.out
 					.println("Enter new process ID (or 0 for auto-increment):");
 			final int newId = Integer.parseInt(scanner.nextLine());
-			
+
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -265,27 +267,24 @@ public abstract class Network implements NetworkInterface {
 	public void sendMessage(Message message) throws RemoteException {
 		synchronized (processes) {
 			switch (message.recipient) {
-			case Message.BROADCAST:
+			case Constants.BROADCAST:
 				for (Entry<Integer, ProcessInterface> pair : processes
 						.entrySet()) {
 					if (!pair.getKey().equals(message.sender)) {
 						Message messageCopy = new Message(message.sender,
 								pair.getKey(), message.clock, message.body);
 						queue.add(messageCopy);
-						System.out.println(messageCopy
-								+ " put in queue. Queue size is "
-								+ queue.size());
+						System.out.println(messageCopy + " put in queue.");
 					}
 				}
 				break;
-			case Message.NETWORK:
+			case Constants.NETWORK:
 				processControlMessage(message);
 				break;
 			default:
 				synchronized (queue) {
 					queue.add(message);
-					System.out.println(message
-							+ " put in queue. Queue size is " + queue.size());
+					System.out.println(message + " put in queue.");
 				}
 				break;
 			}
@@ -317,7 +316,9 @@ public abstract class Network implements NetworkInterface {
 		}
 
 		try {
-			System.out.println("Forwarding " + message);
+			if (this instanceof AsyncNetwork) {
+				System.out.println("Forwarding " + message);
+			}
 			processes.get(message.recipient).recieveMessage(message);
 		} catch (RemoteException e) {
 			System.out.println("Unable to send message " + message
@@ -348,11 +349,12 @@ public abstract class Network implements NetworkInterface {
 	 *            The number of processes.
 	 * @return True in case of success, false otherwise.
 	 */
-	protected void populateNetwork(int size) throws LockedException, DuplicateIDException {
+	protected void populateNetwork(int size) throws LockedException,
+			DuplicateIDException {
 		if (!processes.isEmpty()) {
 			throw new LockedException();
 		}
-		
+
 		for (int i = 0; i < size; i++) {
 			spawnProcess(AUTO_INCREMENT);
 		}

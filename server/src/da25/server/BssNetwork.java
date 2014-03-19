@@ -3,7 +3,7 @@ package da25.server;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-import da25.base.Message;
+import da25.base.Constants;
 import da25.base.exceptions.DuplicateIDException;
 import da25.base.exceptions.LockedException;
 import da25.process.BssProcess;
@@ -56,9 +56,9 @@ public class BssNetwork extends AsyncNetwork {
 		populateNetwork(3);
 
 		try {
-			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "First broadcast");
 			forwardMessage(0);
-			processes.get(2).sendMessage(Message.BROADCAST, "Second broadcast");
+			processes.get(2).sendMessage(Constants.BROADCAST, "Second broadcast");
 			forwardMessage(2);
 			forwardMessage(0);
 			forwardMessage(0);
@@ -85,7 +85,7 @@ public class BssNetwork extends AsyncNetwork {
 		populateNetwork(5);
 
 		try {
-			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "First broadcast");
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i >= 0; i--) {
 					if (queue.get(i).recipient != 5) {
@@ -93,19 +93,19 @@ public class BssNetwork extends AsyncNetwork {
 					}
 				}
 			}
-			processes.get(2).sendMessage(Message.BROADCAST, "Second broadcast");
+			processes.get(2).sendMessage(Constants.BROADCAST, "Second broadcast");
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i > 0; i--) {
 					forwardMessage(i);
 				}
 			}
-			processes.get(3).sendMessage(Message.BROADCAST, "Third broadcast");
+			processes.get(3).sendMessage(Constants.BROADCAST, "Third broadcast");
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i > 0; i--) {
 					forwardMessage(i);
 				}
 			}
-			processes.get(4).sendMessage(Message.BROADCAST, "Fourth broadcast");
+			processes.get(4).sendMessage(Constants.BROADCAST, "Fourth broadcast");
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i > 0; i--) {
 					forwardMessage(i);
@@ -131,10 +131,10 @@ public class BssNetwork extends AsyncNetwork {
 		populateNetwork(2);
 
 		try {
-			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
-			processes.get(1).sendMessage(Message.BROADCAST, "Second broadcast");
-			processes.get(1).sendMessage(Message.BROADCAST, "Third broadcast");
-			processes.get(1).sendMessage(Message.BROADCAST, "Fourth broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "First broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "Second broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "Third broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "Fourth broadcast");
 
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i >= 0; i--) {
@@ -164,14 +164,14 @@ public class BssNetwork extends AsyncNetwork {
 		populateNetwork(4);
 
 		try {
-			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
-			processes.get(2).sendMessage(Message.BROADCAST, "Second broadcast");
+			processes.get(1).sendMessage(Constants.BROADCAST, "First broadcast");
+			processes.get(2).sendMessage(Constants.BROADCAST, "Second broadcast");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
-			processes.get(3).sendMessage(Message.BROADCAST, "Third broadcast");
-			processes.get(4).sendMessage(Message.BROADCAST, "Fourth broadcast");
+			processes.get(3).sendMessage(Constants.BROADCAST, "Third broadcast");
+			processes.get(4).sendMessage(Constants.BROADCAST, "Fourth broadcast");
 
 			synchronized (queue) {
 				for (int i = queue.size() - 1; i >= 0; i--) {
