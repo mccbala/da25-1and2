@@ -1,8 +1,10 @@
 package da25.server;
 
 import java.rmi.RemoteException;
+import java.util.Scanner;
 
 import da25.base.Message;
+import da25.process.Process;
 
 /**
  * An instance of a network performing synchronous message delivery.
@@ -17,6 +19,21 @@ import da25.base.Message;
  * 
  */
 public class SyncNetwork extends Network {
+	public SyncNetwork(Class<? extends Process> processClass) {
+		super(processClass);
+	}
+	
+	@Override
+	protected boolean performCommand(Scanner scanner, String command) {
+		switch (command) {
+		case "":
+			return true;
+		
+		default:
+			return super.performCommand(scanner, command);
+		}
+	}
+	
 	@Override
 	public void sendMessage(Message message) throws RemoteException {
 		synchronized (queue) {

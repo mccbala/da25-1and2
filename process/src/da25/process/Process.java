@@ -1,8 +1,6 @@
 package da25.process;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 import da25.base.Message;
 import da25.base.NetworkInterface;
@@ -10,41 +8,23 @@ import da25.base.ProcessInterface;
 import da25.base.VectorClock;
 
 /**
- * Concrete implementation of a Process
+ * Common prototype for a concrete Process, it has to be subclassed for each
+ * assignment.
+ * <p>
+ * Derived classes must have a nullary constructor.
  * 
  * @author Stefano Tribioli
  * @author Casper Folkers
  * 
  */
-public class Process implements ProcessInterface {
+public abstract class Process implements ProcessInterface {
 	public int id;
-	public VectorClock clock;
+	public VectorClock clock = new VectorClock();;
 	public NetworkInterface network;
-	private ArrayList<Message> buffer;
-	private boolean started = false;
-
-	public Process() {
-		buffer = new ArrayList<Message>();
-	}
 
 	@Override
 	public void start() {
-		if (started) {
-			return;
-		} else {
-			started = true;
-		}
-
-		clock = new VectorClock();
-
-		@SuppressWarnings("unused")
-		Thread parser = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				parseIn();
-			}
-		});
-		// parser.start();
+		return;
 	}
 
 	@Override
@@ -53,81 +33,12 @@ public class Process implements ProcessInterface {
 	}
 
 	/**
-	 * Blocks waiting for user input.
-	 */
-	private void parseIn() {
-		Scanner scanner = new Scanner(System.in);
-		while (true) {
-			System.out.println("Enter message or type 'exit':");
-			String messageBody = scanner.nextLine();
-			if (messageBody.equals("exit")) {
-				scanner.close();
-				return;
-			}
-
-			System.out.println("Enter recipient id:");
-			int recipient = scanner.nextInt();
-			scanner.nextLine();
-
-			sendMessage(recipient, messageBody);
-		}
-	}
-
-	@Override
-	public void recieveMessage(Message message) throws RemoteException {
-		synchronized (clock) {
-			clock.increase(message.sender);
-			if (clock.greaterEqual(message.clock)) {
-				deliverMessage(message);
-
-				boolean newUpdate = true;
-				while (newUpdate) {
-					newUpdate = false;
-					for (int i = 0; i < buffer.size(); i++) {
-						Message nextMessage = buffer.get(i);
-						clock.increase(nextMessage.sender);
-						if (clock.greaterEqual(nextMessage.clock)) {
-							newUpdate = true;
-							deliverMessage(nextMessage);
-							buffer.remove(i);
-							i--;
-						} else {
-							clock.decrease(nextMessage.sender);
-						}
-					}
-				}
-			} else {
-				System.out.println(message + " put in buffer");
-				clock.decrease(message.sender);
-				buffer.add(message);
-			}
-		}
-	}
-
-	/**
 	 * A message is delivered from the local buffer for actual elaboration.
+	 * Since we are only showcasing control algorithms, the process simply
+	 * prints the event to the standard output.
 	 * 
-	 * @param message
 	 */
-	private void deliverMessage(Message message) {
+	protected void deliverMessage(Message message) {
 		System.out.println("Delivered message: " + message);
-	}
-
-	/**
-	 * Sends a new broadcast message.
-	 */
-	@Override
-	public void sendMessage(int recipient, String body) {
-		synchronized (clock) {
-			clock.increase(id);
-			Message message = new Message(id, recipient, new VectorClock(clock), body);
-			try {
-				network.sendMessage(message);
-			} catch (RemoteException e) {
-				clock.decrease(id);
-				System.out.println("Unable to send message " + message
-						+ ", because of: " + e.getMessage());
-			}
-		}
 	}
 }

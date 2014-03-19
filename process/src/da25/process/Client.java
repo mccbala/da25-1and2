@@ -31,8 +31,18 @@ public class Client {
 			throw new RuntimeException(e);
 		}
 
-		process = new Process();
-
+		switch (args[0]) {
+		case "bss":
+			process = new BssProcess();
+			break;
+		case "ag":
+			process = new AgProcess();
+			break;
+		default:
+			System.out.println("No assignment specified.");
+			return;
+		}
+		
 		try {
 			ProcessInterface stub = (ProcessInterface) UnicastRemoteObject
 					.exportObject(process, 0);

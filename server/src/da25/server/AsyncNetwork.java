@@ -7,6 +7,7 @@ import java.util.Scanner;
 import da25.base.Message;
 import da25.base.exceptions.DuplicateIDException;
 import da25.base.exceptions.LockedException;
+import da25.process.Process;
 
 /**
  * An instance of a network performing asynchronous message delivery. Messages
@@ -27,7 +28,9 @@ public class AsyncNetwork extends Network {
 	 */
 	private Thread worker;
 
-	public AsyncNetwork() {
+	public AsyncNetwork(Class<? extends Process> processClass) {
+		super(processClass);
+		
 		worker = new Thread(new Runnable() {
 			@Override
 			public void run() {

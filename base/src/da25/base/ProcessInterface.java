@@ -35,9 +35,9 @@ public interface ProcessInterface extends Remote {
 	public void exit() throws RemoteException;
 
 	/**
-	 * Sends a new broadcast message. Since this function can be accessed from
-	 * outside, only the body and the recipient can be set. The other parameters
-	 * will be filled by the Process object itself.
+	 * Sends a new message. Since this function can be accessed from outside,
+	 * only the body and the recipient can be set. The other parameters will be
+	 * filled by the Process object itself.
 	 */
 	public void sendMessage(int recipient, String body) throws RemoteException;
 }
