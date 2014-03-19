@@ -1,7 +1,11 @@
 package da25.server;
 
+import java.rmi.RemoteException;
 import java.util.Scanner;
 
+import da25.base.Message;
+import da25.base.exceptions.DuplicateIDException;
+import da25.base.exceptions.LockedException;
 import da25.process.AgProcess;
 
 /**
@@ -18,19 +22,33 @@ public class AgNetwork extends SyncNetwork {
 	
 	@Override
 	protected boolean performCommand(Scanner scanner, String command) {
-		switch (command) {
-		case "test1":
-			testCase1();
+		try {
+			switch (command) {
+			case "test1":
+				testCase1();
+				return true;
+			default:
+				return super.performCommand(scanner, command);
+			}
+		} catch (LockedException e) {
+			System.out.println("Unable to populate a non-empty network.");
 			return true;
-		default:
-			return super.performCommand(scanner, command);
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			return true;
 		}
 	}
 	
 	/**
 	 * Test case 1: TODO
 	 */
-	private void testCase1() {
+	private void testCase1() throws LockedException, DuplicateIDException, RemoteException {
+		populateNetwork(10);
 		
+		performCommand(null, "auto");
+		
+		for (int i = 1; i <= 10; i++) {
+			processes.get(i).sendMessage(Message.NETWORK, SyncNetwork.READY_ROUND);
+		}
 	}
 }

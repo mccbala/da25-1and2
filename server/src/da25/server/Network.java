@@ -169,16 +169,22 @@ public abstract class Network implements NetworkInterface {
 			 */
 			System.out
 					.println("Enter new process ID (or 0 for auto-increment):");
-			int newId = Integer.parseInt(scanner.nextLine());
-			try {
-				spawnProcess(newId);
-			} catch (LockedException e) {
-				System.out
-						.println("Unable to spawn new process: network is locked.");
-			} catch (DuplicateIDException e) {
-				System.out
-						.println("Unable to spawn new process: ID already in use.");
-			}
+			final int newId = Integer.parseInt(scanner.nextLine());
+			
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						spawnProcess(newId);
+					} catch (LockedException e) {
+						System.out
+								.println("Unable to spawn new process: network is locked.");
+					} catch (DuplicateIDException e) {
+						System.out
+								.println("Unable to spawn new process: ID already in use.");
+					}
+				}
+			}).start();
 			return true;
 		case "lock":
 			lock();
@@ -234,8 +240,7 @@ public abstract class Network implements NetworkInterface {
 				// object locally.
 			}
 		} catch (InstantiationException | IllegalAccessException e) {
-			System.out.println("Unable to spawn new process.");
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 
@@ -273,6 +278,9 @@ public abstract class Network implements NetworkInterface {
 					}
 				}
 				break;
+			case Message.NETWORK:
+				processControlMessage(message);
+				break;
 			default:
 				synchronized (queue) {
 					queue.add(message);
@@ -282,6 +290,20 @@ public abstract class Network implements NetworkInterface {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Process a message with Message.NETWORK recipient.
+	 * <p>
+	 * This implementation does nothing, but derived classes may override this
+	 * function. For maximum clarity and forward compatibility, they should call
+	 * back to the superclass method if the message is not understood.
+	 * 
+	 * @param message
+	 *            The message to be processed.
+	 */
+	protected void processControlMessage(Message message) {
+		System.out.println("Control message " + message + " discarded");
 	}
 
 	/**
@@ -316,5 +338,24 @@ public abstract class Network implements NetworkInterface {
 				forwardMessage(0);
 			}
 		}
+	}
+
+	/**
+	 * Convenience function to quickly populate a network. Processes will have
+	 * auto-incremented IDs, starting from 1.
+	 * 
+	 * @param size
+	 *            The number of processes.
+	 * @return True in case of success, false otherwise.
+	 */
+	protected void populateNetwork(int size) throws LockedException, DuplicateIDException {
+		if (!processes.isEmpty()) {
+			throw new LockedException();
+		}
+		
+		for (int i = 0; i < size; i++) {
+			spawnProcess(AUTO_INCREMENT);
+		}
+		lock();
 	}
 }

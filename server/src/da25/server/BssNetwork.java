@@ -22,44 +22,38 @@ public class BssNetwork extends AsyncNetwork {
 
 	@Override
 	protected boolean performCommand(Scanner scanner, String command) {
-		switch (command) {
-		case "test1":
-			testCase1();
+		try {
+			switch (command) {
+			case "test1":
+				testCase1();
+				return true;
+			case "test2":
+				testCase2();
+				return true;
+			case "test3":
+				testCase3();
+				return true;
+			case "test4":
+				testCase4();
+				return true;
+			default:
+				return super.performCommand(scanner, command);
+			}
+		} catch (LockedException e) {
+			System.out.println("Unable to populate a non-empty network.");
 			return true;
-		case "test2":
-			testCase2();
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
 			return true;
-		case "test3":
-			testCase3();
-			return true;
-		case "test4":
-			testCase4();
-			return true;
-
-		default:
-			return super.performCommand(scanner, command);
 		}
 	}
-	
+
 	/**
 	 * Test case 1: This simple test case is equal to the one presented in the
 	 * Lecture Slides (slide 6).
 	 */
-	private void testCase1() {
-		try {
-			for (int i = 0; i < 3; i++) {
-				spawnProcess(AUTO_INCREMENT);	
-			}
-			lock();
-		} catch (LockedException e) {
-			System.out
-					.println("Unable to spawn new process: network is locked.");
-			return;
-		} catch (DuplicateIDException e) {
-			System.out
-					.println("Unable to spawn new process: ID already in use.");
-			return;
-		}
+	private void testCase1() throws LockedException, DuplicateIDException {
+		populateNetwork(3);
 
 		try {
 			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
@@ -69,7 +63,7 @@ public class BssNetwork extends AsyncNetwork {
 			forwardMessage(0);
 			forwardMessage(0);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 
@@ -87,21 +81,8 @@ public class BssNetwork extends AsyncNetwork {
 	 * keep them in the buffer. At last, also the first message is forwarded and
 	 * it triggers the delivery of all the stored messages at process 5.
 	 */
-	private void testCase2() {
-		try {
-			for (int i = 0; i < 5; i++) {
-				spawnProcess(AUTO_INCREMENT);	
-			}
-			lock();
-		} catch (LockedException e) {
-			System.out
-					.println("Unable to spawn new process: network is locked.");
-			return;
-		} catch (DuplicateIDException e) {
-			System.out
-					.println("Unable to spawn new process: ID already in use.");
-			return;
-		}
+	private void testCase2() throws LockedException, DuplicateIDException {
+		populateNetwork(5);
 
 		try {
 			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
@@ -133,7 +114,7 @@ public class BssNetwork extends AsyncNetwork {
 
 			forwardMessage(0);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 
@@ -146,21 +127,8 @@ public class BssNetwork extends AsyncNetwork {
 	 * a single first message from that source. This is to show that FIFO links
 	 * are not needed for this algorithm to work correctly.
 	 */
-	private void testCase3() {
-		try {
-			for (int i = 0; i < 2; i++) {
-				spawnProcess(AUTO_INCREMENT);	
-			}
-			lock();
-		} catch (LockedException e) {
-			System.out
-					.println("Unable to spawn new process: network is locked.");
-			return;
-		} catch (DuplicateIDException e) {
-			System.out
-					.println("Unable to spawn new process: ID already in use.");
-			return;
-		}
+	private void testCase3() throws LockedException, DuplicateIDException {
+		populateNetwork(2);
 
 		try {
 			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
@@ -174,7 +142,7 @@ public class BssNetwork extends AsyncNetwork {
 				}
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 
@@ -192,21 +160,8 @@ public class BssNetwork extends AsyncNetwork {
 	 * are concurrent from the point of view of the processes. So they are
 	 * delivered without buffering.
 	 */
-	private void testCase4() {
-		try {
-			for (int i = 0; i < 4; i++) {
-				spawnProcess(AUTO_INCREMENT);	
-			}
-			lock();
-		} catch (LockedException e) {
-			System.out
-					.println("Unable to spawn new process: network is locked.");
-			return;
-		} catch (DuplicateIDException e) {
-			System.out
-					.println("Unable to spawn new process: ID already in use.");
-			return;
-		}
+	private void testCase4() throws LockedException, DuplicateIDException {
+		populateNetwork(4);
 
 		try {
 			processes.get(1).sendMessage(Message.BROADCAST, "First broadcast");
@@ -224,7 +179,7 @@ public class BssNetwork extends AsyncNetwork {
 				}
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 }
