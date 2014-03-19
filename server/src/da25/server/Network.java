@@ -58,7 +58,8 @@ public abstract class Network implements NetworkInterface {
 	/**
 	 * Creates a new network instance.
 	 * 
-	 * @param processClass When spawning processes, they will be object of this class.
+	 * @param processClass
+	 *            When spawning processes, they will be object of this class.
 	 */
 	public Network(Class<? extends Process> processClass) {
 		this.processClass = processClass;
@@ -256,17 +257,10 @@ public abstract class Network implements NetworkInterface {
 	}
 
 	@Override
-	public void sendMessage(Message message, int recipient)
-			throws RemoteException {
-		synchronized (queue) {
-			queue.add(message);
-		}
-	}
-
-	@Override
 	public void sendMessage(Message message) throws RemoteException {
 		synchronized (processes) {
-			if (message.recipient == Message.BROADCAST) {
+			switch (message.recipient) {
+			case Message.BROADCAST:
 				for (Entry<Integer, ProcessInterface> pair : processes
 						.entrySet()) {
 					if (!pair.getKey().equals(message.sender)) {
@@ -278,12 +272,14 @@ public abstract class Network implements NetworkInterface {
 								+ queue.size());
 					}
 				}
-			} else {
+				break;
+			default:
 				synchronized (queue) {
 					queue.add(message);
 					System.out.println(message
 							+ " put in queue. Queue size is " + queue.size());
 				}
+				break;
 			}
 		}
 	}

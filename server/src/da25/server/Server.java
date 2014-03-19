@@ -6,8 +6,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import da25.base.NetworkInterface;
-import da25.process.AgProcess;
-import da25.process.BssProcess;
 
 /**
  * Main class for server, holding RMI logic only.
@@ -24,10 +22,10 @@ public class Server {
 		
 		switch (args[0]) {
 		case "bss":
-			network = new AsyncNetwork(BssProcess.class);
+			network = new BssNetwork();
 			break;
 		case "ag":
-			network = new SyncNetwork(AgProcess.class);
+			network = new AgNetwork();
 			break;
 		default:
 			System.out.println("No assignment specified.");
