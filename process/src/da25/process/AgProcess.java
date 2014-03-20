@@ -15,7 +15,7 @@ public class AgProcess extends Process {
 	private final static String ACK = "MSG_ACK";
 
 	public boolean randomize = false;
-	
+
 	private boolean isCandidate = false;
 	private int candidateLevel = -1;
 	private ArrayList<Integer> links;
@@ -92,7 +92,7 @@ public class AgProcess extends Process {
 					if (randomize) {
 						Collections.shuffle(links, new Random(id));
 					}
-					
+
 					Iterator<Integer> iter = links.iterator();
 					for (int i = 0; i < candidatesTarget; i++) {
 						int recipient = iter.next();

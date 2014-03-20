@@ -10,11 +10,11 @@ public class VectorClock implements Serializable {
 	public VectorClock() {
 		vector = new HashMap<>();
 	}
-	
+
 	public VectorClock(VectorClock vectorClock) {
 		vector = new HashMap<>(vectorClock.vector);
 	}
-	
+
 	synchronized public void reset() {
 		vector.clear();
 	}
@@ -41,7 +41,7 @@ public class VectorClock implements Serializable {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -53,19 +53,19 @@ public class VectorClock implements Serializable {
 				largestId = key;
 			}
 		}
-		
+
 		StringBuilder bld = new StringBuilder();
 		bld.append("(");
-		
+
 		for (int i = 1; i <= largestId; i++) {
 			bld.append(get(i));
 			bld.append(",");
 		}
-		
+
 		if (bld.length() > 1) {
 			bld.deleteCharAt(bld.length() - 1);
 		}
-		
+
 		bld.append(")");
 		return bld.toString();
 	}

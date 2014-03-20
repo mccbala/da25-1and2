@@ -19,7 +19,7 @@ import da25.base.VectorClock;
  */
 public abstract class Process implements ProcessInterface {
 	public int id;
-	public VectorClock clock = new VectorClock();;
+	public VectorClock clock = new VectorClock();
 	public NetworkInterface network;
 
 	@Override
@@ -31,7 +31,7 @@ public abstract class Process implements ProcessInterface {
 	public void exit() throws RemoteException {
 		System.exit(0);
 	}
-	
+
 	/**
 	 * A message is delivered from the local buffer for actual elaboration.
 	 * Since we are only showcasing control algorithms, the process simply

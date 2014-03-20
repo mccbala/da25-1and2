@@ -26,7 +26,7 @@ public class AsyncNetwork extends Network {
 
 	public AsyncNetwork(Class<? extends Process> processClass) {
 		super(processClass);
-		
+
 		worker = new Thread(new Runnable() {
 			@Override
 			public void run() {

@@ -42,7 +42,7 @@ public class Client {
 			System.out.println("No assignment specified.");
 			return;
 		}
-		
+
 		try {
 			ProcessInterface stub = (ProcessInterface) UnicastRemoteObject
 					.exportObject(process, 0);
@@ -52,12 +52,13 @@ public class Client {
 				process.id = network.register(stub);
 			} catch (LockedException e) {
 				System.out.println("Unable to register: network is locked.");
+				throw new RuntimeException(e);
 			}
 		} catch (RemoteException e) {
 			System.out.println("Unable to register: RemoteException.");
 			throw new RuntimeException(e);
 		}
-		
+
 		System.out.println("Process " + process.id
 				+ " is registered in the network.");
 	}

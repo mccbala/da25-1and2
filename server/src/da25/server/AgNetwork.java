@@ -18,7 +18,7 @@ public class AgNetwork extends SyncNetwork {
 	public AgNetwork() {
 		super(AgProcess.class);
 	}
-	
+
 	@Override
 	protected boolean performCommand(Scanner scanner, String command) {
 		try {
@@ -37,24 +37,25 @@ public class AgNetwork extends SyncNetwork {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Test case 1: TODO
 	 */
-	private void testCase1() throws LockedException, DuplicateIDException, RemoteException {
+	private void testCase1() throws LockedException, DuplicateIDException,
+			RemoteException {
 		populateNetwork(200);
-		
+
 		((AgProcess) processes.get(4)).randomize = true;
 		((AgProcess) processes.get(4)).startCandidate();
-		
+
 		((AgProcess) processes.get(10)).randomize = true;
 		((AgProcess) processes.get(10)).startCandidate();
-		
+
 		performCommand(null, "round");
-		
+
 		((AgProcess) processes.get(100)).randomize = true;
 		((AgProcess) processes.get(100)).startCandidate();
-		
+
 		performCommand(null, "auto");
 	}
 }

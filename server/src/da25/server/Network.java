@@ -149,7 +149,7 @@ public abstract class Network implements NetworkInterface {
 	/**
 	 * Actually perform the actions requested by the user. This function can be
 	 * extended by derived classes, but they really should call through to the
-	 * current class's implementation.
+	 * current class's implementation if the command is not consumed.
 	 * 
 	 * @param scanner
 	 *            The one Scanner operating on standard input.

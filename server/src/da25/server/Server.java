@@ -12,14 +12,15 @@ import da25.base.NetworkInterface;
  * 
  * @author Stefano Tribioli
  * @author Casper Folkers
- *
+ * 
  */
 public class Server {
 	public static Network network;
 
 	public static void main(String[] args) {
-		System.setProperty("java.rmi.server.codebase", NetworkInterface.class.getProtectionDomain().getCodeSource().getLocation().toString());
-		
+		System.setProperty("java.rmi.server.codebase", NetworkInterface.class
+				.getProtectionDomain().getCodeSource().getLocation().toString());
+
 		switch (args[0]) {
 		case "bss":
 			network = new BssNetwork();
@@ -30,16 +31,17 @@ public class Server {
 		default:
 			System.out.println("No assignment specified.");
 		}
-		
+
 		try {
-			NetworkInterface stub = (NetworkInterface) UnicastRemoteObject.exportObject(network, 0);
+			NetworkInterface stub = (NetworkInterface) UnicastRemoteObject
+					.exportObject(network, 0);
 			Registry registry = LocateRegistry.getRegistry();
 			registry.rebind(NetworkInterface.class.getCanonicalName(), stub);
 		} catch (RemoteException e) {
 			System.out.println("Unable to init RMI environment.");
 			throw new RuntimeException(e);
 		}
-		
+
 		network.start();
 	}
 }

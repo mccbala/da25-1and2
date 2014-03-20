@@ -74,7 +74,7 @@ public class SyncNetwork extends Network {
 				if (autoMode == 0) {
 					autoMode = -1;
 				}
-				
+
 				nextRound();
 			}
 			return;
