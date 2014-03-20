@@ -8,7 +8,6 @@ import java.util.Random;
 
 import da25.base.Constants;
 import da25.base.Message;
-import da25.base.VectorClock;
 
 public class AgProcess extends Process {
 	private final static String CANDIDATE = "MSG_CAN";
@@ -98,8 +97,8 @@ public class AgProcess extends Process {
 						int recipient = iter.next();
 						try {
 							network.sendMessage(new Message(id, recipient,
-									new VectorClock(), CANDIDATE + "|"
-											+ candidateLevel + "|" + id));
+									null, CANDIDATE + "|" + candidateLevel
+											+ "|" + id));
 							iter.remove();
 						} catch (RemoteException e) {
 							throw new RuntimeException(e);
@@ -141,13 +140,12 @@ public class AgProcess extends Process {
 
 			if (winningLink > -1) {
 				try {
-					network.sendMessage(new Message(id, winningLink,
-							new VectorClock(), ACK));
+					network.sendMessage(new Message(id, winningLink, null, ACK));
 				} catch (RemoteException e) {
 					throw new RuntimeException(e);
 				}
 			}
-			
+
 			ordinaryLevel++;
 		}
 	}
@@ -158,8 +156,8 @@ public class AgProcess extends Process {
 
 		try {
 			if (!isElected) {
-				network.sendMessage(new Message(id, Constants.NETWORK,
-						new VectorClock(), Constants.READY_ROUND));
+				network.sendMessage(new Message(id, Constants.NETWORK, null,
+						Constants.READY_ROUND));
 			}
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
@@ -170,8 +168,7 @@ public class AgProcess extends Process {
 	public void sendMessage(int recipient, String body) throws RemoteException {
 		synchronized (clock) {
 			clock.increase(id);
-			Message message = new Message(id, recipient, new VectorClock(),
-					body);
+			Message message = new Message(id, recipient, null, body);
 			try {
 				network.sendMessage(message);
 			} catch (RemoteException e) {

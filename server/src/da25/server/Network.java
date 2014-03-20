@@ -138,7 +138,7 @@ public abstract class Network implements NetworkInterface {
 			try {
 				String command = scanner.nextLine();
 				if (!performCommand(scanner, command)) {
-					System.out.println("Unknown command: '"+command+"'");
+					System.out.println("Unknown command: '" + command + "'");
 				}
 			} catch (NoSuchElementException e) {
 				break;
@@ -202,9 +202,11 @@ public abstract class Network implements NetworkInterface {
 				try {
 					process.exit();
 				} catch (RemoteException e) {
-					// The call will always throw a SocketException
-					// since the client terminates before sending return
-					// value, but this is fine for us.
+					/*
+					 * The call will always throw a SocketException since the
+					 * client terminates before sending return value, but this
+					 * is fine for us.
+					 */
 				}
 			}
 			System.exit(0);
@@ -238,8 +240,10 @@ public abstract class Network implements NetworkInterface {
 					process.id = register(process);
 				}
 			} catch (RemoteException re) {
-				// This exception is never thrown, since we are creating the
-				// object locally.
+				/*
+				 * This exception is never thrown, since we are creating the
+				 * object locally.
+				 */
 			}
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace(System.out);
@@ -274,7 +278,8 @@ public abstract class Network implements NetworkInterface {
 						Message messageCopy = new Message(message.sender,
 								pair.getKey(), message.clock, message.body);
 						queue.add(messageCopy);
-						System.out.println(messageCopy + " put in queue.");
+						System.out.println(messageCopy.toString(processes
+								.size()) + " put in queue.");
 					}
 				}
 				break;
@@ -317,7 +322,13 @@ public abstract class Network implements NetworkInterface {
 
 		try {
 			if (this instanceof AsyncNetwork) {
-				System.out.println("Forwarding " + message);
+				/*
+				 * The forwarding operation is interesting in an async
+				 * environment, much less in a sync one, since there it happends
+				 * predictably at the end of the round.
+				 */
+				System.out.println("Forwarding "
+						+ message.toString(processes.size()));
 			}
 			processes.get(message.recipient).recieveMessage(message);
 		} catch (RemoteException e) {
