@@ -138,7 +138,7 @@ public abstract class Network implements NetworkInterface {
 			try {
 				String command = scanner.nextLine();
 				if (!performCommand(scanner, command)) {
-					System.out.println("Unknown command.");
+					System.out.println("Unknown command: '"+command+"'");
 				}
 			} catch (NoSuchElementException e) {
 				break;

@@ -28,13 +28,16 @@ public class BssNetwork extends AsyncNetwork {
 				testCase1();
 				return true;
 			case "test2":
-				testCase2();
+				testCase2(true);
 				return true;
 			case "test3":
 				testCase3();
 				return true;
 			case "test4":
 				testCase4();
+				return true;
+			case "test5":
+				testCase5();
 				return true;
 			default:
 				return super.performCommand(scanner, command);
@@ -82,9 +85,22 @@ public class BssNetwork extends AsyncNetwork {
 	 * messages are dependent on the first one, the message with ID 5 has to
 	 * keep them in the buffer. At last, also the first message is forwarded and
 	 * it triggers the delivery of all the stored messages at process 5.
+	 * 
+	 * @param autoSpawn
+	 *            If true, it automatically spawns five processes, otherwise it
+	 *            expects to find them in the network.
 	 */
-	private void testCase2() throws LockedException, DuplicateIDException {
-		populateNetwork(5);
+	private void testCase2(boolean autoSpawn) throws LockedException,
+			DuplicateIDException {
+		if (autoSpawn) {
+			populateNetwork(5);
+		} else {
+			if (!locked || processes.size() != 5) {
+				System.out
+						.println("Test case 2 with autoSpawn turned off expects to find a locked network with five processes.");
+				throw new RuntimeException();
+			}
+		}
 
 		try {
 			processes.get(1)
@@ -195,5 +211,15 @@ public class BssNetwork extends AsyncNetwork {
 		} catch (RemoteException e) {
 			e.printStackTrace(System.out);
 		}
+	}
+
+	/**
+	 * Test case 5: this is a copy of test case 2, but without automatic process
+	 * spawning, in order to showcase the ability of our solution to work also
+	 * with RMI calls. Five clients must be created on external VMs and network
+	 * must be locked before starting the test.
+	 */
+	private void testCase5() throws LockedException, DuplicateIDException {
+		testCase2(false);
 	}
 }

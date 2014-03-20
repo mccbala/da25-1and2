@@ -39,7 +39,7 @@ public class AgNetwork extends SyncNetwork {
 	}
 
 	/**
-	 * Test case 1: TODO
+	 * Test case 1.
 	 */
 	private void testCase1() throws LockedException, DuplicateIDException,
 			RemoteException {
