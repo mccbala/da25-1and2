@@ -23,6 +23,19 @@ public class AgNetwork extends SyncNetwork {
 	protected boolean performCommand(Scanner scanner, String command) {
 		try {
 			switch (command) {
+			case "start":
+				System.out.println("Enter ID of process:");
+				int candidateId = Integer.parseInt(scanner.nextLine());
+				
+				lock();
+				
+				try {
+					((AgProcess) processes.get(candidateId)).startCandidate();
+				} catch (NullPointerException e) {
+					System.out
+							.println("Entered ID is not present in the network.");
+				}
+				return true;
 			case "test1":
 				testCase1();
 				return true;

@@ -171,22 +171,36 @@ public abstract class Network implements NetworkInterface {
 			 */
 			System.out
 					.println("Enter new process ID (or 0 for auto-increment):");
-			final int newId = Integer.parseInt(scanner.nextLine());
+			int newId = Integer.parseInt(scanner.nextLine());
 
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						spawnProcess(newId);
-					} catch (LockedException e) {
-						System.out
-								.println("Unable to spawn new process: network is locked.");
-					} catch (DuplicateIDException e) {
-						System.out
-								.println("Unable to spawn new process: ID already in use.");
-					}
-				}
-			}).start();
+			try {
+				spawnProcess(newId);
+			} catch (LockedException e) {
+				System.out
+						.println("Unable to spawn new process: network is locked.");
+			} catch (DuplicateIDException e) {
+				System.out
+						.println("Unable to spawn new process: ID already in use.");
+			}
+			return true;
+		case "populate":
+			/*
+			 * A "populate" command will quicky spawn a specified number of
+			 * processes with incrementing IDs.
+			 */
+			System.out
+					.println("Enter size of the network:");
+			int newSize = Integer.parseInt(scanner.nextLine());
+			
+			try {
+				populateNetwork(newSize);
+			} catch (LockedException e) {
+				System.out
+						.println("Unable to spawn new process: network is locked.");
+			} catch (DuplicateIDException e) {
+				System.out
+						.println("Unable to spawn new process: ID already in use.");
+			}
 			return true;
 		case "lock":
 			lock();
@@ -369,6 +383,7 @@ public abstract class Network implements NetworkInterface {
 		for (int i = 0; i < size; i++) {
 			spawnProcess(AUTO_INCREMENT);
 		}
+		
 		lock();
 	}
 }

@@ -179,6 +179,14 @@ public class AgProcess extends Process {
 	}
 
 	public void startCandidate() {
+		if (isCandidate) {
+			System.out.println("Process is already a candidate.");
+		}
+		
+		if (candidateLevel > -1) {
+			System.out.println("Process already tried to be a candidate.");
+		}
+		
 		try {
 			links = new ArrayList<>(network.getIds());
 			links.remove(Integer.valueOf(id));
