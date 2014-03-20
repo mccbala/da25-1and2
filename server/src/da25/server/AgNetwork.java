@@ -1,6 +1,7 @@
 package da25.server;
 
 import java.rmi.RemoteException;
+import java.util.Random;
 import java.util.Scanner;
 
 import da25.base.exceptions.DuplicateIDException;
@@ -26,9 +27,9 @@ public class AgNetwork extends SyncNetwork {
 			case "start":
 				System.out.println("Enter ID of process:");
 				int candidateId = Integer.parseInt(scanner.nextLine());
-				
+
 				lock();
-				
+
 				try {
 					((AgProcess) processes.get(candidateId)).startCandidate();
 				} catch (NullPointerException e) {
@@ -56,18 +57,25 @@ public class AgNetwork extends SyncNetwork {
 	 */
 	private void testCase1() throws LockedException, DuplicateIDException,
 			RemoteException {
-		populateNetwork(200);
+		int clientsCount = 200;
+		populateNetwork(clientsCount);
 
-		((AgProcess) processes.get(4)).randomize = true;
-		((AgProcess) processes.get(4)).startCandidate();
+		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
+				.startCandidate();
 
-		((AgProcess) processes.get(10)).randomize = true;
-		((AgProcess) processes.get(10)).startCandidate();
+		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
+		.startCandidate();
 
+		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
+		.startCandidate();
+		
 		performCommand(null, "round");
 
-		((AgProcess) processes.get(100)).randomize = true;
-		((AgProcess) processes.get(100)).startCandidate();
+		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
+		.startCandidate();
+		
+		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
+		.startCandidate();
 
 		performCommand(null, "auto");
 	}

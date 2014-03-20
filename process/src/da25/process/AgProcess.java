@@ -13,7 +13,7 @@ public class AgProcess extends Process {
 	private final static String CANDIDATE = "MSG_CAN";
 	private final static String ACK = "MSG_ACK";
 
-	public boolean randomize = false;
+	public boolean randomize = true;
 
 	private boolean isCandidate = false;
 	private int candidateLevel = -1;

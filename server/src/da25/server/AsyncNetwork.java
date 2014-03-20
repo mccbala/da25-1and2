@@ -17,7 +17,7 @@ public class AsyncNetwork extends Network {
 	/**
 	 * A fixed amount of time to wait before dispatching the next message.
 	 */
-	public static final long DISPATCH_DELAY = 1000;
+	public static final long DISPATCH_DELAY = 100;
 
 	/**
 	 * A worker thread who regularly checks the message queue.

@@ -39,10 +39,7 @@ public abstract class Process implements ProcessInterface {
 	 * 
 	 */
 	protected void deliverMessage(Message message) {
-		try {
-			System.out.println("Delivered message: " + message.toString(network.getIds().size()));
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+			System.out.println("Delivered message: " + message);
+		
 	}
 }

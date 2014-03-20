@@ -38,7 +38,7 @@ public class Message implements Serializable {
 	public String toString(int largestId) {
 		if (clock != null) {
 			return "[Message from " + sender + " to " + recipient + ", VC"
-					+ clock.toStringExtended(largestId) + ", saying '" + body
+					+ clock + ", saying '" + body
 					+ "']";
 		} else {
 			return toString();
