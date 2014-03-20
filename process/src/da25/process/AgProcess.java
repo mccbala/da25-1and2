@@ -147,6 +147,8 @@ public class AgProcess extends Process {
 					throw new RuntimeException(e);
 				}
 			}
+			
+			ordinaryLevel++;
 		}
 	}
 
@@ -192,6 +194,6 @@ public class AgProcess extends Process {
 	public static boolean pairIsLarger(int referenceLevel, int referenceId,
 			int otherLevel, int otherId) {
 		return otherLevel > referenceLevel
-				|| (otherLevel == referenceId && otherId > referenceId);
+				|| (otherLevel == referenceLevel && otherId > referenceId);
 	}
 }
