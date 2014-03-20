@@ -39,7 +39,6 @@ public abstract class Process implements ProcessInterface {
 	 * 
 	 */
 	protected void deliverMessage(Message message) {
-			System.out.println("Delivered message: " + message);
-		
+		System.out.println("Delivered message: " + message);
 	}
 }

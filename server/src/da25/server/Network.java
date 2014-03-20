@@ -171,8 +171,14 @@ public abstract class Network implements NetworkInterface {
 			 */
 			System.out
 					.println("Enter new process ID (or 0 for auto-increment):");
-			int newId = Integer.parseInt(scanner.nextLine());
-
+			
+			int newId;
+			try {
+				newId = Integer.parseInt(scanner.nextLine());
+			} catch (NumberFormatException e) {
+				newId = AUTO_INCREMENT;
+			}
+			
 			try {
 				spawnProcess(newId);
 			} catch (LockedException e) {

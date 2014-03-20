@@ -64,18 +64,18 @@ public class AgNetwork extends SyncNetwork {
 				.startCandidate();
 
 		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
-		.startCandidate();
+				.startCandidate();
 
 		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
-		.startCandidate();
-		
+				.startCandidate();
+
 		performCommand(null, "round");
 
 		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
-		.startCandidate();
-		
+				.startCandidate();
+
 		((AgProcess) processes.get(new Random().nextInt(clientsCount) + 1))
-		.startCandidate();
+				.startCandidate();
 
 		performCommand(null, "auto");
 	}

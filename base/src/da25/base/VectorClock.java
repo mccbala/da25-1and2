@@ -47,30 +47,10 @@ public class VectorClock implements Serializable {
 	}
 
 	@Override
-synchronized public String toString() {
-	int largestId = 0;
-	for (int key : vector.keySet()) {
-	if (key > largestId) {
-	largestId = key;
+	synchronized public String toString() {
+		return toStringCompact();
 	}
-	}
-	
-	StringBuilder bld = new StringBuilder();
-	bld.append("(");
-	
-	for (int i = 1; i <= largestId; i++) {
-	bld.append(get(i));
-	bld.append(",");
-	}
-	
-	if (bld.length() > 1) {
-	bld.deleteCharAt(bld.length() - 1);
-	}
-	
-	bld.append(")");
-	return bld.toString();
-}
-	
+
 	synchronized public String toStringPairs() {
 		StringBuilder bld = new StringBuilder();
 		bld.append("(");
@@ -89,7 +69,7 @@ synchronized public String toString() {
 		bld.append(")");
 		return bld.toString();
 	}
-	
+
 	synchronized public String toStringCompact() {
 		int largestId = 0;
 		for (int key : vector.keySet()) {
@@ -100,7 +80,7 @@ synchronized public String toString() {
 
 		return toStringExtended(largestId);
 	}
-	
+
 	synchronized public String toStringExtended(int largestId) {
 		StringBuilder bld = new StringBuilder();
 		bld.append("(");

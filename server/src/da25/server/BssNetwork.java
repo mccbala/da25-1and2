@@ -9,7 +9,6 @@ import da25.base.ProcessInterface;
 import da25.base.exceptions.DuplicateIDException;
 import da25.base.exceptions.LockedException;
 import da25.process.BssProcess;
-import da25.process.Process;
 
 /**
  * The actual network for assignment 1, complete with a test suite.
@@ -228,27 +227,33 @@ public class BssNetwork extends AsyncNetwork {
 	private void testCase5() throws LockedException, DuplicateIDException {
 		testCase2(false);
 	}
-	
-	private void testCase6() throws LockedException, DuplicateIDException 
-	{
+
+	/**
+	 * Test case 6: this is a completely random test. It picks five random
+	 * processes in an already locked network with arbitrary size, then everyone
+	 * sends a broadcast with a fixed delay. In the meantime, the worker thread
+	 * is running, forwarding messages in random order.
+	 */
+	private void testCase6() throws LockedException, DuplicateIDException {
 		if (!locked) {
 			System.out.println("Test case 6 expects to find a locked network");
 			throw new RuntimeException();
 		}
+
 		worker.start();
+
 		try {
-			for(int i = 0; i< 5; i++){
-				int randomProcessID = new Random().nextInt(processes.keySet().size()-1);
-				ProcessInterface randomProcess = processes.get(randomProcessID+1);
-				randomProcess.sendMessage(Constants.BROADCAST, "broadcast" + i);
-				Thread.sleep(DISPATCH_DELAY*2);
+			for (int i = 1; i <= 5; i++) {
+				int randomProcessID = new Random().nextInt(processes.keySet()
+						.size() - 1);
+				ProcessInterface randomProcess = processes
+						.get(randomProcessID + 1);
+				randomProcess.sendMessage(Constants.BROADCAST, "Broadcast " + i);
+				Thread.sleep(DISPATCH_DELAY * 2);
 			}
-		} 
-		catch (RemoteException e) {
-			e.printStackTrace(System.out);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }
